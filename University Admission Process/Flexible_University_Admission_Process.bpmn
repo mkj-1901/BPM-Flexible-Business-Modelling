@@ -1,0 +1,397 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_FlexibleUniversityAdmission" targetNamespace="http://bpmn.io/schema/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/20100524/MODEL.xsd">
+  <bpmn:process id="FlexibleUniversityAdmissionProcess" name="Unified Flexible University Admission Process" isExecutable="true">
+    <bpmn:documentation>Unified flexible model for four illustrative variants: V1 Standard Admission, V2 Online Fast-Track, V3 Legacy Paper-Based, and V4 Rejected Application. Set process variable variant to V1, V2, V3, or V4 to select the intended path. Gateway conditions use Camunda 8 FEEL expressions. Activity shapes are generic BPMN tasks for diagramming; configure executable implementations or task types before running in an engine.
+
+Variation Points:
+1. Eligibility Check — Manual (V1,V3,V4 default) vs Automated (V2)
+2. Assessment Mode — Entrance Exam (V1,V4 default) vs Interview (V3) vs Skip (V2)
+3. Merit Evaluation — Committee (V1,V3,V4 default) vs Automated (V2)
+4. Admission Decision — Offer Admission (V1,V2,V3 default) vs Reject (V4)
+5. Enrollment — Enroll Student (V1,V3) vs Skip/bypass (V2,V4)</bpmn:documentation>
+
+    <!-- Start -->
+    <bpmn:startEvent id="StartEvent" name="Start" />
+
+    <!-- Shared: Submit Application -->
+    <bpmn:task id="SubmitApplication" name="Submit Application" />
+
+    <!-- VP1: Eligibility Check -->
+    <bpmn:exclusiveGateway id="EligibilitySplit" name="Eligibility Check" gatewayDirection="Diverging" default="F_EligSplit_Manual" />
+    <bpmn:task id="CheckEligibilityManual" name="Check Eligibility (Manual)" />
+    <bpmn:task id="CheckEligibilityAutomated" name="Check Eligibility (Automated)" />
+    <bpmn:exclusiveGateway id="EligibilityJoin" gatewayDirection="Converging" />
+
+    <!-- VP2: Assessment Mode (3-way) -->
+    <bpmn:exclusiveGateway id="AssessmentSplit" name="Assessment Mode" gatewayDirection="Diverging" default="F_AssessSplit_Exam" />
+    <bpmn:task id="ConductEntranceExam" name="Conduct Entrance Exam" />
+    <bpmn:task id="ConductInterview" name="Conduct Interview" />
+    <bpmn:exclusiveGateway id="AssessmentJoin" gatewayDirection="Converging" />
+
+    <!-- VP3: Merit Evaluation -->
+    <bpmn:exclusiveGateway id="MeritSplit" name="Merit Evaluation" gatewayDirection="Diverging" default="F_MeritSplit_Committee" />
+    <bpmn:task id="EvaluateMeritCommittee" name="Evaluate Merit (Committee)" />
+    <bpmn:task id="EvaluateMeritAutomated" name="Evaluate Merit (Automated)" />
+    <bpmn:exclusiveGateway id="MeritJoin" gatewayDirection="Converging" />
+
+    <!-- VP4: Admission Decision -->
+    <bpmn:exclusiveGateway id="DecisionSplit" name="Admission Decision" gatewayDirection="Diverging" default="F_DecisionSplit_Offer" />
+    <bpmn:task id="OfferAdmission" name="Offer Admission" />
+    <bpmn:task id="RejectApplication" name="Reject Application" />
+    <bpmn:exclusiveGateway id="DecisionJoin" gatewayDirection="Converging" />
+
+    <!-- VP5: Enrollment -->
+    <bpmn:exclusiveGateway id="EnrollSplit" name="Enrollment?" gatewayDirection="Diverging" default="F_EnrollSplit_Skip" />
+    <bpmn:task id="EnrollStudent" name="Enroll Student" />
+    <bpmn:exclusiveGateway id="EnrollJoin" gatewayDirection="Converging" />
+
+    <!-- End -->
+    <bpmn:endEvent id="EndEvent" name="End" />
+
+    <!-- Sequence Flows -->
+    <bpmn:sequenceFlow id="F_Start_Submit" sourceRef="StartEvent" targetRef="SubmitApplication" />
+    <bpmn:sequenceFlow id="F_Submit_EligSplit" sourceRef="SubmitApplication" targetRef="EligibilitySplit" />
+
+    <!-- VP1 flows -->
+    <bpmn:sequenceFlow id="F_EligSplit_Manual" sourceRef="EligibilitySplit" targetRef="CheckEligibilityManual" name="Manual (V1,V3,V4)" />
+    <bpmn:sequenceFlow id="F_EligSplit_Automated" sourceRef="EligibilitySplit" targetRef="CheckEligibilityAutomated" name="Automated (V2)">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= variant = "V2"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F_Manual_EligJoin" sourceRef="CheckEligibilityManual" targetRef="EligibilityJoin" />
+    <bpmn:sequenceFlow id="F_Automated_EligJoin" sourceRef="CheckEligibilityAutomated" targetRef="EligibilityJoin" />
+
+    <bpmn:sequenceFlow id="F_EligJoin_AssessSplit" sourceRef="EligibilityJoin" targetRef="AssessmentSplit" />
+
+    <!-- VP2 flows (3-way: Exam default, Interview V3, Skip V2) -->
+    <bpmn:sequenceFlow id="F_AssessSplit_Exam" sourceRef="AssessmentSplit" targetRef="ConductEntranceExam" name="Exam (V1,V4)" />
+    <bpmn:sequenceFlow id="F_AssessSplit_Interview" sourceRef="AssessmentSplit" targetRef="ConductInterview" name="Interview (V3)">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= variant = "V3"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F_AssessSplit_Skip" sourceRef="AssessmentSplit" targetRef="AssessmentJoin" name="Skip (V2)">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= variant = "V2"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F_Exam_AssessJoin" sourceRef="ConductEntranceExam" targetRef="AssessmentJoin" />
+    <bpmn:sequenceFlow id="F_Interview_AssessJoin" sourceRef="ConductInterview" targetRef="AssessmentJoin" />
+
+    <bpmn:sequenceFlow id="F_AssessJoin_MeritSplit" sourceRef="AssessmentJoin" targetRef="MeritSplit" />
+
+    <!-- VP3 flows -->
+    <bpmn:sequenceFlow id="F_MeritSplit_Committee" sourceRef="MeritSplit" targetRef="EvaluateMeritCommittee" name="Committee (V1,V3,V4)" />
+    <bpmn:sequenceFlow id="F_MeritSplit_Auto" sourceRef="MeritSplit" targetRef="EvaluateMeritAutomated" name="Automated (V2)">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= variant = "V2"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F_Committee_MeritJoin" sourceRef="EvaluateMeritCommittee" targetRef="MeritJoin" />
+    <bpmn:sequenceFlow id="F_Auto_MeritJoin" sourceRef="EvaluateMeritAutomated" targetRef="MeritJoin" />
+
+    <bpmn:sequenceFlow id="F_MeritJoin_DecisionSplit" sourceRef="MeritJoin" targetRef="DecisionSplit" />
+
+    <!-- VP4 flows -->
+    <bpmn:sequenceFlow id="F_DecisionSplit_Offer" sourceRef="DecisionSplit" targetRef="OfferAdmission" name="Offer (V1,V2,V3)" />
+    <bpmn:sequenceFlow id="F_DecisionSplit_Reject" sourceRef="DecisionSplit" targetRef="RejectApplication" name="Reject (V4)">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= variant = "V4"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F_Offer_DecisionJoin" sourceRef="OfferAdmission" targetRef="DecisionJoin" />
+    <bpmn:sequenceFlow id="F_Reject_DecisionJoin" sourceRef="RejectApplication" targetRef="DecisionJoin" />
+
+    <bpmn:sequenceFlow id="F_DecisionJoin_EnrollSplit" sourceRef="DecisionJoin" targetRef="EnrollSplit" />
+
+    <!-- VP5 flows -->
+    <bpmn:sequenceFlow id="F_EnrollSplit_Enroll" sourceRef="EnrollSplit" targetRef="EnrollStudent" name="Enroll (V1,V3)">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= variant = "V1" or variant = "V3"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F_EnrollSplit_Skip" sourceRef="EnrollSplit" targetRef="EnrollJoin" name="Skip (V2,V4)" />
+    <bpmn:sequenceFlow id="F_Enroll_EnrollJoin" sourceRef="EnrollStudent" targetRef="EnrollJoin" />
+
+    <bpmn:sequenceFlow id="F_EnrollJoin_End" sourceRef="EnrollJoin" targetRef="EndEvent" />
+  </bpmn:process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_FlexibleUniversityAdmission">
+    <bpmndi:BPMNPlane id="BPMNPlane_FlexibleUniversityAdmission" bpmnElement="FlexibleUniversityAdmissionProcess">
+
+      <!-- Start Event -->
+      <bpmndi:BPMNShape id="StartEvent_di" bpmnElement="StartEvent">
+        <dc:Bounds x="40" y="282" width="36" height="36" />
+      </bpmndi:BPMNShape>
+
+      <!-- Submit Application -->
+      <bpmndi:BPMNShape id="SubmitApplication_di" bpmnElement="SubmitApplication">
+        <dc:Bounds x="110" y="270" width="140" height="60" />
+      </bpmndi:BPMNShape>
+
+      <!-- VP1: Eligibility -->
+      <bpmndi:BPMNShape id="EligibilitySplit_di" bpmnElement="EligibilitySplit" isMarkerVisible="true">
+        <dc:Bounds x="285" y="284" width="32" height="32" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CheckEligibilityManual_di" bpmnElement="CheckEligibilityManual">
+        <dc:Bounds x="355" y="190" width="175" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CheckEligibilityAutomated_di" bpmnElement="CheckEligibilityAutomated">
+        <dc:Bounds x="355" y="350" width="190" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EligibilityJoin_di" bpmnElement="EligibilityJoin" isMarkerVisible="true">
+        <dc:Bounds x="585" y="284" width="32" height="32" />
+      </bpmndi:BPMNShape>
+
+      <!-- VP2: Assessment Mode (3-way) -->
+      <bpmndi:BPMNShape id="AssessmentSplit_di" bpmnElement="AssessmentSplit" isMarkerVisible="true">
+        <dc:Bounds x="650" y="284" width="32" height="32" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ConductEntranceExam_di" bpmnElement="ConductEntranceExam">
+        <dc:Bounds x="720" y="190" width="170" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ConductInterview_di" bpmnElement="ConductInterview">
+        <dc:Bounds x="720" y="350" width="150" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="AssessmentJoin_di" bpmnElement="AssessmentJoin" isMarkerVisible="true">
+        <dc:Bounds x="930" y="284" width="32" height="32" />
+      </bpmndi:BPMNShape>
+
+      <!-- VP3: Merit Evaluation -->
+      <bpmndi:BPMNShape id="MeritSplit_di" bpmnElement="MeritSplit" isMarkerVisible="true">
+        <dc:Bounds x="995" y="284" width="32" height="32" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EvaluateMeritCommittee_di" bpmnElement="EvaluateMeritCommittee">
+        <dc:Bounds x="1065" y="190" width="185" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EvaluateMeritAutomated_di" bpmnElement="EvaluateMeritAutomated">
+        <dc:Bounds x="1065" y="350" width="185" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="MeritJoin_di" bpmnElement="MeritJoin" isMarkerVisible="true">
+        <dc:Bounds x="1290" y="284" width="32" height="32" />
+      </bpmndi:BPMNShape>
+
+      <!-- VP4: Admission Decision -->
+      <bpmndi:BPMNShape id="DecisionSplit_di" bpmnElement="DecisionSplit" isMarkerVisible="true">
+        <dc:Bounds x="1355" y="284" width="32" height="32" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="OfferAdmission_di" bpmnElement="OfferAdmission">
+        <dc:Bounds x="1425" y="190" width="140" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="RejectApplication_di" bpmnElement="RejectApplication">
+        <dc:Bounds x="1425" y="350" width="150" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DecisionJoin_di" bpmnElement="DecisionJoin" isMarkerVisible="true">
+        <dc:Bounds x="1615" y="284" width="32" height="32" />
+      </bpmndi:BPMNShape>
+
+      <!-- VP5: Enrollment -->
+      <bpmndi:BPMNShape id="EnrollSplit_di" bpmnElement="EnrollSplit" isMarkerVisible="true">
+        <dc:Bounds x="1680" y="284" width="32" height="32" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EnrollStudent_di" bpmnElement="EnrollStudent">
+        <dc:Bounds x="1750" y="190" width="130" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EnrollJoin_di" bpmnElement="EnrollJoin" isMarkerVisible="true">
+        <dc:Bounds x="1920" y="284" width="32" height="32" />
+      </bpmndi:BPMNShape>
+
+      <!-- End Event -->
+      <bpmndi:BPMNShape id="EndEvent_di" bpmnElement="EndEvent">
+        <dc:Bounds x="1990" y="282" width="36" height="36" />
+      </bpmndi:BPMNShape>
+
+      <!-- === EDGES === -->
+
+      <!-- Start → Submit -->
+      <bpmndi:BPMNEdge id="F_Start_Submit_di" bpmnElement="F_Start_Submit">
+        <di:waypoint x="76" y="300" />
+        <di:waypoint x="110" y="300" />
+      </bpmndi:BPMNEdge>
+
+      <!-- Submit → EligibilitySplit -->
+      <bpmndi:BPMNEdge id="F_Submit_EligSplit_di" bpmnElement="F_Submit_EligSplit">
+        <di:waypoint x="250" y="300" />
+        <di:waypoint x="285" y="300" />
+      </bpmndi:BPMNEdge>
+
+      <!-- VP1: EligibilitySplit → Manual (up) -->
+      <bpmndi:BPMNEdge id="F_EligSplit_Manual_di" bpmnElement="F_EligSplit_Manual">
+        <di:waypoint x="317" y="300" />
+        <di:waypoint x="336" y="300" />
+        <di:waypoint x="336" y="220" />
+        <di:waypoint x="355" y="220" />
+      </bpmndi:BPMNEdge>
+
+      <!-- VP1: EligibilitySplit → Automated (down) -->
+      <bpmndi:BPMNEdge id="F_EligSplit_Automated_di" bpmnElement="F_EligSplit_Automated">
+        <di:waypoint x="317" y="300" />
+        <di:waypoint x="336" y="300" />
+        <di:waypoint x="336" y="380" />
+        <di:waypoint x="355" y="380" />
+      </bpmndi:BPMNEdge>
+
+      <!-- Manual → EligibilityJoin -->
+      <bpmndi:BPMNEdge id="F_Manual_EligJoin_di" bpmnElement="F_Manual_EligJoin">
+        <di:waypoint x="530" y="220" />
+        <di:waypoint x="557" y="220" />
+        <di:waypoint x="557" y="300" />
+        <di:waypoint x="585" y="300" />
+      </bpmndi:BPMNEdge>
+
+      <!-- Automated → EligibilityJoin -->
+      <bpmndi:BPMNEdge id="F_Automated_EligJoin_di" bpmnElement="F_Automated_EligJoin">
+        <di:waypoint x="545" y="380" />
+        <di:waypoint x="565" y="380" />
+        <di:waypoint x="565" y="300" />
+        <di:waypoint x="585" y="300" />
+      </bpmndi:BPMNEdge>
+
+      <!-- EligibilityJoin → AssessmentSplit -->
+      <bpmndi:BPMNEdge id="F_EligJoin_AssessSplit_di" bpmnElement="F_EligJoin_AssessSplit">
+        <di:waypoint x="617" y="300" />
+        <di:waypoint x="650" y="300" />
+      </bpmndi:BPMNEdge>
+
+      <!-- VP2: AssessmentSplit → Exam (up) -->
+      <bpmndi:BPMNEdge id="F_AssessSplit_Exam_di" bpmnElement="F_AssessSplit_Exam">
+        <di:waypoint x="682" y="300" />
+        <di:waypoint x="701" y="300" />
+        <di:waypoint x="701" y="220" />
+        <di:waypoint x="720" y="220" />
+      </bpmndi:BPMNEdge>
+
+      <!-- VP2: AssessmentSplit → Interview (down) -->
+      <bpmndi:BPMNEdge id="F_AssessSplit_Interview_di" bpmnElement="F_AssessSplit_Interview">
+        <di:waypoint x="682" y="300" />
+        <di:waypoint x="701" y="300" />
+        <di:waypoint x="701" y="380" />
+        <di:waypoint x="720" y="380" />
+      </bpmndi:BPMNEdge>
+
+      <!-- VP2: AssessmentSplit → Skip (straight to join) -->
+      <bpmndi:BPMNEdge id="F_AssessSplit_Skip_di" bpmnElement="F_AssessSplit_Skip">
+        <di:waypoint x="666" y="284" />
+        <di:waypoint x="666" y="150" />
+        <di:waypoint x="946" y="150" />
+        <di:waypoint x="946" y="284" />
+      </bpmndi:BPMNEdge>
+
+      <!-- Exam → AssessmentJoin -->
+      <bpmndi:BPMNEdge id="F_Exam_AssessJoin_di" bpmnElement="F_Exam_AssessJoin">
+        <di:waypoint x="890" y="220" />
+        <di:waypoint x="910" y="220" />
+        <di:waypoint x="910" y="300" />
+        <di:waypoint x="930" y="300" />
+      </bpmndi:BPMNEdge>
+
+      <!-- Interview → AssessmentJoin -->
+      <bpmndi:BPMNEdge id="F_Interview_AssessJoin_di" bpmnElement="F_Interview_AssessJoin">
+        <di:waypoint x="870" y="380" />
+        <di:waypoint x="900" y="380" />
+        <di:waypoint x="900" y="300" />
+        <di:waypoint x="930" y="300" />
+      </bpmndi:BPMNEdge>
+
+      <!-- AssessmentJoin → MeritSplit -->
+      <bpmndi:BPMNEdge id="F_AssessJoin_MeritSplit_di" bpmnElement="F_AssessJoin_MeritSplit">
+        <di:waypoint x="962" y="300" />
+        <di:waypoint x="995" y="300" />
+      </bpmndi:BPMNEdge>
+
+      <!-- VP3: MeritSplit → Committee (up) -->
+      <bpmndi:BPMNEdge id="F_MeritSplit_Committee_di" bpmnElement="F_MeritSplit_Committee">
+        <di:waypoint x="1027" y="300" />
+        <di:waypoint x="1046" y="300" />
+        <di:waypoint x="1046" y="220" />
+        <di:waypoint x="1065" y="220" />
+      </bpmndi:BPMNEdge>
+
+      <!-- VP3: MeritSplit → Automated (down) -->
+      <bpmndi:BPMNEdge id="F_MeritSplit_Auto_di" bpmnElement="F_MeritSplit_Auto">
+        <di:waypoint x="1027" y="300" />
+        <di:waypoint x="1046" y="300" />
+        <di:waypoint x="1046" y="380" />
+        <di:waypoint x="1065" y="380" />
+      </bpmndi:BPMNEdge>
+
+      <!-- Committee → MeritJoin -->
+      <bpmndi:BPMNEdge id="F_Committee_MeritJoin_di" bpmnElement="F_Committee_MeritJoin">
+        <di:waypoint x="1250" y="220" />
+        <di:waypoint x="1270" y="220" />
+        <di:waypoint x="1270" y="300" />
+        <di:waypoint x="1290" y="300" />
+      </bpmndi:BPMNEdge>
+
+      <!-- Automated Merit → MeritJoin -->
+      <bpmndi:BPMNEdge id="F_Auto_MeritJoin_di" bpmnElement="F_Auto_MeritJoin">
+        <di:waypoint x="1250" y="380" />
+        <di:waypoint x="1270" y="380" />
+        <di:waypoint x="1270" y="300" />
+        <di:waypoint x="1290" y="300" />
+      </bpmndi:BPMNEdge>
+
+      <!-- MeritJoin → DecisionSplit -->
+      <bpmndi:BPMNEdge id="F_MeritJoin_DecisionSplit_di" bpmnElement="F_MeritJoin_DecisionSplit">
+        <di:waypoint x="1322" y="300" />
+        <di:waypoint x="1355" y="300" />
+      </bpmndi:BPMNEdge>
+
+      <!-- VP4: DecisionSplit → Offer (up) -->
+      <bpmndi:BPMNEdge id="F_DecisionSplit_Offer_di" bpmnElement="F_DecisionSplit_Offer">
+        <di:waypoint x="1387" y="300" />
+        <di:waypoint x="1406" y="300" />
+        <di:waypoint x="1406" y="220" />
+        <di:waypoint x="1425" y="220" />
+      </bpmndi:BPMNEdge>
+
+      <!-- VP4: DecisionSplit → Reject (down) -->
+      <bpmndi:BPMNEdge id="F_DecisionSplit_Reject_di" bpmnElement="F_DecisionSplit_Reject">
+        <di:waypoint x="1387" y="300" />
+        <di:waypoint x="1406" y="300" />
+        <di:waypoint x="1406" y="380" />
+        <di:waypoint x="1425" y="380" />
+      </bpmndi:BPMNEdge>
+
+      <!-- Offer → DecisionJoin -->
+      <bpmndi:BPMNEdge id="F_Offer_DecisionJoin_di" bpmnElement="F_Offer_DecisionJoin">
+        <di:waypoint x="1565" y="220" />
+        <di:waypoint x="1590" y="220" />
+        <di:waypoint x="1590" y="300" />
+        <di:waypoint x="1615" y="300" />
+      </bpmndi:BPMNEdge>
+
+      <!-- Reject → DecisionJoin -->
+      <bpmndi:BPMNEdge id="F_Reject_DecisionJoin_di" bpmnElement="F_Reject_DecisionJoin">
+        <di:waypoint x="1575" y="380" />
+        <di:waypoint x="1595" y="380" />
+        <di:waypoint x="1595" y="300" />
+        <di:waypoint x="1615" y="300" />
+      </bpmndi:BPMNEdge>
+
+      <!-- DecisionJoin → EnrollSplit -->
+      <bpmndi:BPMNEdge id="F_DecisionJoin_EnrollSplit_di" bpmnElement="F_DecisionJoin_EnrollSplit">
+        <di:waypoint x="1647" y="300" />
+        <di:waypoint x="1680" y="300" />
+      </bpmndi:BPMNEdge>
+
+      <!-- VP5: EnrollSplit → Enroll (up) -->
+      <bpmndi:BPMNEdge id="F_EnrollSplit_Enroll_di" bpmnElement="F_EnrollSplit_Enroll">
+        <di:waypoint x="1712" y="300" />
+        <di:waypoint x="1731" y="300" />
+        <di:waypoint x="1731" y="220" />
+        <di:waypoint x="1750" y="220" />
+      </bpmndi:BPMNEdge>
+
+      <!-- VP5: EnrollSplit → Skip (straight to join) -->
+      <bpmndi:BPMNEdge id="F_EnrollSplit_Skip_di" bpmnElement="F_EnrollSplit_Skip">
+        <di:waypoint x="1712" y="300" />
+        <di:waypoint x="1920" y="300" />
+      </bpmndi:BPMNEdge>
+
+      <!-- Enroll → EnrollJoin -->
+      <bpmndi:BPMNEdge id="F_Enroll_EnrollJoin_di" bpmnElement="F_Enroll_EnrollJoin">
+        <di:waypoint x="1880" y="220" />
+        <di:waypoint x="1900" y="220" />
+        <di:waypoint x="1900" y="300" />
+        <di:waypoint x="1920" y="300" />
+      </bpmndi:BPMNEdge>
+
+      <!-- EnrollJoin → End -->
+      <bpmndi:BPMNEdge id="F_EnrollJoin_End_di" bpmnElement="F_EnrollJoin_End">
+        <di:waypoint x="1952" y="300" />
+        <di:waypoint x="1990" y="300" />
+      </bpmndi:BPMNEdge>
+
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

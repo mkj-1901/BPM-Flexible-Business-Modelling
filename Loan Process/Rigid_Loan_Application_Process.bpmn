@@ -1,0 +1,77 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_RigidLoanApplicationProcess" targetNamespace="http://bpmn.io/schema/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/20100524/MODEL.xsd">
+  <bpmn:process id="RigidLoanApplicationProcess" name="Rigid Loan Application Process" isExecutable="true">
+    <bpmn:documentation>Baseline rigid model: one fixed path with six sequential activities. This file is intended as a BPMN model for Camunda 8 Desktop Modeler.</bpmn:documentation>
+    <bpmn:startEvent id="StartEvent" name="Start" />
+    <bpmn:task id="ReceiveRequest" name="Receive Request" />
+    <bpmn:task id="CheckCreditSystem" name="Check Credit System" />
+    <bpmn:task id="VerifyDocuments" name="Verify Documents" />
+    <bpmn:task id="AssessManually" name="Assess Manually" />
+    <bpmn:task id="AcceptLoan" name="Accept Loan" />
+    <bpmn:task id="ArchiveRequest" name="Archive Request" />
+    <bpmn:endEvent id="EndEvent" name="End" />
+    <bpmn:sequenceFlow id="Flow_Start_Receive" sourceRef="StartEvent" targetRef="ReceiveRequest" />
+    <bpmn:sequenceFlow id="Flow_Receive_Credit" sourceRef="ReceiveRequest" targetRef="CheckCreditSystem" />
+    <bpmn:sequenceFlow id="Flow_Credit_Verify" sourceRef="CheckCreditSystem" targetRef="VerifyDocuments" />
+    <bpmn:sequenceFlow id="Flow_Verify_Assess" sourceRef="VerifyDocuments" targetRef="AssessManually" />
+    <bpmn:sequenceFlow id="Flow_Assess_Accept" sourceRef="AssessManually" targetRef="AcceptLoan" />
+    <bpmn:sequenceFlow id="Flow_Accept_Archive" sourceRef="AcceptLoan" targetRef="ArchiveRequest" />
+    <bpmn:sequenceFlow id="Flow_Archive_End" sourceRef="ArchiveRequest" targetRef="EndEvent" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_RigidLoanApplicationProcess">
+    <bpmndi:BPMNPlane id="BPMNPlane_RigidLoanApplicationProcess" bpmnElement="RigidLoanApplicationProcess">
+      <bpmndi:BPMNShape id="StartEvent_di" bpmnElement="StartEvent">
+        <dc:Bounds x="70" y="170" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ReceiveRequest_di" bpmnElement="ReceiveRequest">
+        <dc:Bounds x="145" y="158" width="125" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CheckCreditSystem_di" bpmnElement="CheckCreditSystem">
+        <dc:Bounds x="310" y="158" width="145" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="VerifyDocuments_di" bpmnElement="VerifyDocuments">
+        <dc:Bounds x="495" y="158" width="135" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="AssessManually_di" bpmnElement="AssessManually">
+        <dc:Bounds x="670" y="158" width="130" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="AcceptLoan_di" bpmnElement="AcceptLoan">
+        <dc:Bounds x="840" y="158" width="120" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ArchiveRequest_di" bpmnElement="ArchiveRequest">
+        <dc:Bounds x="1000" y="158" width="130" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_di" bpmnElement="EndEvent">
+        <dc:Bounds x="1170" y="170" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_Start_Receive_di" bpmnElement="Flow_Start_Receive">
+        <di:waypoint x="106" y="188" />
+        <di:waypoint x="145" y="188" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Receive_Credit_di" bpmnElement="Flow_Receive_Credit">
+        <di:waypoint x="270" y="188" />
+        <di:waypoint x="310" y="188" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Credit_Verify_di" bpmnElement="Flow_Credit_Verify">
+        <di:waypoint x="455" y="188" />
+        <di:waypoint x="495" y="188" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Verify_Assess_di" bpmnElement="Flow_Verify_Assess">
+        <di:waypoint x="630" y="188" />
+        <di:waypoint x="670" y="188" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Assess_Accept_di" bpmnElement="Flow_Assess_Accept">
+        <di:waypoint x="800" y="188" />
+        <di:waypoint x="840" y="188" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Accept_Archive_di" bpmnElement="Flow_Accept_Archive">
+        <di:waypoint x="960" y="188" />
+        <di:waypoint x="1000" y="188" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Archive_End_di" bpmnElement="Flow_Archive_End">
+        <di:waypoint x="1130" y="188" />
+        <di:waypoint x="1170" y="188" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

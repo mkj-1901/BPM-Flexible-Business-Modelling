@@ -1,0 +1,59 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_RigidUniversityAdmissionV2" targetNamespace="http://bpmn.io/schema/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/20100524/MODEL.xsd">
+  <bpmn:process id="RigidUniversityAdmissionV2" name="V2 - Online Fast-Track Admission" isExecutable="true">
+    <bpmn:documentation>V2 Online Fast-Track Admission: Five sequential activities for a streamlined digital process. Eligibility is checked automatically, no entrance exam is conducted, merit is evaluated by an automated scoring system, and the student self-enrolls online after receiving an admission offer.</bpmn:documentation>
+    <bpmn:startEvent id="StartEvent" name="Start" />
+    <bpmn:task id="SubmitApplication" name="Submit Application" />
+    <bpmn:task id="CheckEligibilityAutomated" name="Check Eligibility (Automated)" />
+    <bpmn:task id="EvaluateMeritAutomated" name="Evaluate Merit (Automated)" />
+    <bpmn:task id="OfferAdmission" name="Offer Admission" />
+    <bpmn:endEvent id="EndEvent" name="End" />
+    <bpmn:sequenceFlow id="Flow_Start_Submit" sourceRef="StartEvent" targetRef="SubmitApplication" />
+    <bpmn:sequenceFlow id="Flow_Submit_Eligibility" sourceRef="SubmitApplication" targetRef="CheckEligibilityAutomated" />
+    <bpmn:sequenceFlow id="Flow_Eligibility_Merit" sourceRef="CheckEligibilityAutomated" targetRef="EvaluateMeritAutomated" />
+    <bpmn:sequenceFlow id="Flow_Merit_Offer" sourceRef="EvaluateMeritAutomated" targetRef="OfferAdmission" />
+    <bpmn:sequenceFlow id="Flow_Offer_End" sourceRef="OfferAdmission" targetRef="EndEvent" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_V2">
+    <bpmndi:BPMNPlane id="BPMNPlane_V2" bpmnElement="RigidUniversityAdmissionV2">
+      <bpmndi:BPMNShape id="StartEvent_di" bpmnElement="StartEvent">
+        <dc:Bounds x="70" y="170" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SubmitApplication_di" bpmnElement="SubmitApplication">
+        <dc:Bounds x="145" y="158" width="140" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CheckEligibilityAutomated_di" bpmnElement="CheckEligibilityAutomated">
+        <dc:Bounds x="325" y="158" width="190" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EvaluateMeritAutomated_di" bpmnElement="EvaluateMeritAutomated">
+        <dc:Bounds x="555" y="158" width="200" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="OfferAdmission_di" bpmnElement="OfferAdmission">
+        <dc:Bounds x="795" y="158" width="140" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_di" bpmnElement="EndEvent">
+        <dc:Bounds x="975" y="170" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_Start_Submit_di" bpmnElement="Flow_Start_Submit">
+        <di:waypoint x="106" y="188" />
+        <di:waypoint x="145" y="188" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Submit_Eligibility_di" bpmnElement="Flow_Submit_Eligibility">
+        <di:waypoint x="285" y="188" />
+        <di:waypoint x="325" y="188" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Eligibility_Merit_di" bpmnElement="Flow_Eligibility_Merit">
+        <di:waypoint x="515" y="188" />
+        <di:waypoint x="555" y="188" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Merit_Offer_di" bpmnElement="Flow_Merit_Offer">
+        <di:waypoint x="755" y="188" />
+        <di:waypoint x="795" y="188" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Offer_End_di" bpmnElement="Flow_Offer_End">
+        <di:waypoint x="935" y="188" />
+        <di:waypoint x="975" y="188" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

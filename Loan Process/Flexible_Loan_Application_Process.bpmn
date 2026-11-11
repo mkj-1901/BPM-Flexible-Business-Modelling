@@ -1,0 +1,232 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_FlexibleLoanApplicationProcess" targetNamespace="http://bpmn.io/schema/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/20100524/MODEL.xsd">
+  <bpmn:process id="FlexibleLoanApplicationProcess" name="Unified Flexible Loan Application Process" isExecutable="true">
+    <bpmn:documentation>Unified flexible model for four illustrative variants: V1 Standard Branch, V2 Digital Fast-Track, V3 Legacy Paper-File, and V4 High-Risk Rejected. Set process variable variant to V1, V2, V3, or V4 to select the intended path. Gateway conditions use Camunda 8 FEEL expressions. Activity shapes are generic BPMN tasks for diagramming; configure executable implementations or task types before running in an engine.</bpmn:documentation>
+    <bpmn:startEvent id="StartEvent" name="Start" />
+    <bpmn:task id="ReceiveRequest" name="Receive Request" />
+    <bpmn:exclusiveGateway id="CreditSplit" name="Credit Source" gatewayDirection="Diverging" default="F_CreditSplit_System" />
+    <bpmn:task id="CheckCreditSystem" name="Check Credit System" />
+    <bpmn:task id="CheckPaperArchive" name="Check Paper Archive" />
+    <bpmn:exclusiveGateway id="CreditJoin" gatewayDirection="Converging" />
+    <bpmn:task id="VerifyDocuments" name="Verify Documents" />
+    <bpmn:exclusiveGateway id="AssessmentSplit" name="Assessment Mode" gatewayDirection="Diverging" default="F_AssessSplit_Manual" />
+    <bpmn:task id="AssessManually" name="Assess Manually" />
+    <bpmn:task id="AutoApproveCheck" name="Auto-Approve Check" />
+    <bpmn:exclusiveGateway id="AssessmentJoin" gatewayDirection="Converging" />
+    <bpmn:exclusiveGateway id="DecisionSplit" name="Loan Decision" gatewayDirection="Diverging" default="F_DecisionSplit_Accept" />
+    <bpmn:task id="AcceptLoan" name="Accept Loan" />
+    <bpmn:task id="RejectLoan" name="Reject Loan" />
+    <bpmn:exclusiveGateway id="DecisionJoin" gatewayDirection="Converging" />
+    <bpmn:exclusiveGateway id="ArchiveSplit" name="Archive?" gatewayDirection="Diverging" default="F_ArchiveSplit_Skip" />
+    <bpmn:task id="ArchiveRequest" name="Archive Request" />
+    <bpmn:exclusiveGateway id="ArchiveJoin" gatewayDirection="Converging" />
+    <bpmn:endEvent id="EndEvent" name="End" />
+    <bpmn:sequenceFlow id="F_Start_Receive" sourceRef="StartEvent" targetRef="ReceiveRequest" />
+    <bpmn:sequenceFlow id="F_Receive_CreditSplit" sourceRef="ReceiveRequest" targetRef="CreditSplit" />
+    <bpmn:sequenceFlow id="F_CreditSplit_System" sourceRef="CreditSplit" targetRef="CheckCreditSystem" name="Digital / Standard" />
+    <bpmn:sequenceFlow id="F_CreditSplit_Paper" sourceRef="CreditSplit" targetRef="CheckPaperArchive" name="Legacy">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= variant = "V3"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F_System_CreditJoin" sourceRef="CheckCreditSystem" targetRef="CreditJoin" />
+    <bpmn:sequenceFlow id="F_Paper_CreditJoin" sourceRef="CheckPaperArchive" targetRef="CreditJoin" />
+    <bpmn:sequenceFlow id="F_CreditJoin_Verify" sourceRef="CreditJoin" targetRef="VerifyDocuments" />
+    <bpmn:sequenceFlow id="F_Verify_AssessSplit" sourceRef="VerifyDocuments" targetRef="AssessmentSplit" />
+    <bpmn:sequenceFlow id="F_AssessSplit_Manual" sourceRef="AssessmentSplit" targetRef="AssessManually" name="Standard / High-risk" />
+    <bpmn:sequenceFlow id="F_AssessSplit_Auto" sourceRef="AssessmentSplit" targetRef="AutoApproveCheck" name="Low-risk / Digital">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= variant = "V2"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F_Manual_AssessJoin" sourceRef="AssessManually" targetRef="AssessmentJoin" />
+    <bpmn:sequenceFlow id="F_Auto_AssessJoin" sourceRef="AutoApproveCheck" targetRef="AssessmentJoin" />
+    <bpmn:sequenceFlow id="F_AssessJoin_DecisionSplit" sourceRef="AssessmentJoin" targetRef="DecisionSplit" />
+    <bpmn:sequenceFlow id="F_DecisionSplit_Accept" sourceRef="DecisionSplit" targetRef="AcceptLoan" name="Eligible" />
+    <bpmn:sequenceFlow id="F_DecisionSplit_Reject" sourceRef="DecisionSplit" targetRef="RejectLoan" name="Ineligible">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= variant = "V4"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F_Accept_DecisionJoin" sourceRef="AcceptLoan" targetRef="DecisionJoin" />
+    <bpmn:sequenceFlow id="F_Reject_DecisionJoin" sourceRef="RejectLoan" targetRef="DecisionJoin" />
+    <bpmn:sequenceFlow id="F_DecisionJoin_ArchiveSplit" sourceRef="DecisionJoin" targetRef="ArchiveSplit" />
+    <bpmn:sequenceFlow id="F_ArchiveSplit_Archive" sourceRef="ArchiveSplit" targetRef="ArchiveRequest" name="Branch dossier">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= variant = "V1" or variant = "V3"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F_ArchiveSplit_Skip" sourceRef="ArchiveSplit" targetRef="ArchiveJoin" name="Digital / Rejected" />
+    <bpmn:sequenceFlow id="F_Archive_ArchiveJoin" sourceRef="ArchiveRequest" targetRef="ArchiveJoin" />
+    <bpmn:sequenceFlow id="F_ArchiveJoin_End" sourceRef="ArchiveJoin" targetRef="EndEvent" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_FlexibleLoanApplicationProcess">
+    <bpmndi:BPMNPlane id="BPMNPlane_FlexibleLoanApplicationProcess" bpmnElement="FlexibleLoanApplicationProcess">
+      <bpmndi:BPMNShape id="StartEvent_di" bpmnElement="StartEvent">
+        <dc:Bounds x="40" y="245" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ReceiveRequest_di" bpmnElement="ReceiveRequest">
+        <dc:Bounds x="100" y="233" width="125" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CreditSplit_di" bpmnElement="CreditSplit">
+        <dc:Bounds x="260" y="247" width="32" height="32" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CheckCreditSystem_di" bpmnElement="CheckCreditSystem">
+        <dc:Bounds x="325" y="165" width="145" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CheckPaperArchive_di" bpmnElement="CheckPaperArchive">
+        <dc:Bounds x="325" y="305" width="145" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CreditJoin_di" bpmnElement="CreditJoin">
+        <dc:Bounds x="510" y="247" width="32" height="32" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="VerifyDocuments_di" bpmnElement="VerifyDocuments">
+        <dc:Bounds x="570" y="233" width="135" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="AssessmentSplit_di" bpmnElement="AssessmentSplit">
+        <dc:Bounds x="740" y="247" width="32" height="32" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="AssessManually_di" bpmnElement="AssessManually">
+        <dc:Bounds x="800" y="165" width="130" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="AutoApproveCheck_di" bpmnElement="AutoApproveCheck">
+        <dc:Bounds x="800" y="305" width="140" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="AssessmentJoin_di" bpmnElement="AssessmentJoin">
+        <dc:Bounds x="975" y="247" width="32" height="32" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DecisionSplit_di" bpmnElement="DecisionSplit">
+        <dc:Bounds x="1030" y="247" width="32" height="32" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="AcceptLoan_di" bpmnElement="AcceptLoan">
+        <dc:Bounds x="1090" y="165" width="115" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="RejectLoan_di" bpmnElement="RejectLoan">
+        <dc:Bounds x="1090" y="305" width="115" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DecisionJoin_di" bpmnElement="DecisionJoin">
+        <dc:Bounds x="1240" y="247" width="32" height="32" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ArchiveSplit_di" bpmnElement="ArchiveSplit">
+        <dc:Bounds x="1295" y="247" width="32" height="32" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ArchiveRequest_di" bpmnElement="ArchiveRequest">
+        <dc:Bounds x="1360" y="165" width="130" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ArchiveJoin_di" bpmnElement="ArchiveJoin">
+        <dc:Bounds x="1525" y="247" width="32" height="32" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_di" bpmnElement="EndEvent">
+        <dc:Bounds x="1590" y="245" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="F_Start_Receive_di" bpmnElement="F_Start_Receive">
+        <di:waypoint x="76" y="263" />
+        <di:waypoint x="100" y="263" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_Receive_CreditSplit_di" bpmnElement="F_Receive_CreditSplit">
+        <di:waypoint x="225" y="263" />
+        <di:waypoint x="260" y="263" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_CreditSplit_System_di" bpmnElement="F_CreditSplit_System">
+        <di:waypoint x="292" y="263" />
+        <di:waypoint x="308" y="263" />
+        <di:waypoint x="308" y="195" />
+        <di:waypoint x="325" y="195" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_CreditSplit_Paper_di" bpmnElement="F_CreditSplit_Paper">
+        <di:waypoint x="292" y="263" />
+        <di:waypoint x="308" y="263" />
+        <di:waypoint x="308" y="335" />
+        <di:waypoint x="325" y="335" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_System_CreditJoin_di" bpmnElement="F_System_CreditJoin">
+        <di:waypoint x="470" y="195" />
+        <di:waypoint x="490" y="195" />
+        <di:waypoint x="490" y="263" />
+        <di:waypoint x="510" y="263" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_Paper_CreditJoin_di" bpmnElement="F_Paper_CreditJoin">
+        <di:waypoint x="470" y="335" />
+        <di:waypoint x="490" y="335" />
+        <di:waypoint x="490" y="263" />
+        <di:waypoint x="510" y="263" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_CreditJoin_Verify_di" bpmnElement="F_CreditJoin_Verify">
+        <di:waypoint x="542" y="263" />
+        <di:waypoint x="570" y="263" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_Verify_AssessSplit_di" bpmnElement="F_Verify_AssessSplit">
+        <di:waypoint x="705" y="263" />
+        <di:waypoint x="740" y="263" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_AssessSplit_Manual_di" bpmnElement="F_AssessSplit_Manual">
+        <di:waypoint x="772" y="263" />
+        <di:waypoint x="786" y="263" />
+        <di:waypoint x="786" y="195" />
+        <di:waypoint x="800" y="195" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_AssessSplit_Auto_di" bpmnElement="F_AssessSplit_Auto">
+        <di:waypoint x="772" y="263" />
+        <di:waypoint x="786" y="263" />
+        <di:waypoint x="786" y="335" />
+        <di:waypoint x="800" y="335" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_Manual_AssessJoin_di" bpmnElement="F_Manual_AssessJoin">
+        <di:waypoint x="930" y="195" />
+        <di:waypoint x="952" y="195" />
+        <di:waypoint x="952" y="263" />
+        <di:waypoint x="975" y="263" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_Auto_AssessJoin_di" bpmnElement="F_Auto_AssessJoin">
+        <di:waypoint x="940" y="335" />
+        <di:waypoint x="957" y="335" />
+        <di:waypoint x="957" y="263" />
+        <di:waypoint x="975" y="263" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_AssessJoin_DecisionSplit_di" bpmnElement="F_AssessJoin_DecisionSplit">
+        <di:waypoint x="1007" y="263" />
+        <di:waypoint x="1030" y="263" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_DecisionSplit_Accept_di" bpmnElement="F_DecisionSplit_Accept">
+        <di:waypoint x="1062" y="263" />
+        <di:waypoint x="1076" y="263" />
+        <di:waypoint x="1076" y="195" />
+        <di:waypoint x="1090" y="195" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_DecisionSplit_Reject_di" bpmnElement="F_DecisionSplit_Reject">
+        <di:waypoint x="1062" y="263" />
+        <di:waypoint x="1076" y="263" />
+        <di:waypoint x="1076" y="335" />
+        <di:waypoint x="1090" y="335" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_Accept_DecisionJoin_di" bpmnElement="F_Accept_DecisionJoin">
+        <di:waypoint x="1205" y="195" />
+        <di:waypoint x="1222" y="195" />
+        <di:waypoint x="1222" y="263" />
+        <di:waypoint x="1240" y="263" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_Reject_DecisionJoin_di" bpmnElement="F_Reject_DecisionJoin">
+        <di:waypoint x="1205" y="335" />
+        <di:waypoint x="1222" y="335" />
+        <di:waypoint x="1222" y="263" />
+        <di:waypoint x="1240" y="263" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_DecisionJoin_ArchiveSplit_di" bpmnElement="F_DecisionJoin_ArchiveSplit">
+        <di:waypoint x="1272" y="263" />
+        <di:waypoint x="1295" y="263" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_ArchiveSplit_Archive_di" bpmnElement="F_ArchiveSplit_Archive">
+        <di:waypoint x="1327" y="263" />
+        <di:waypoint x="1343" y="263" />
+        <di:waypoint x="1343" y="195" />
+        <di:waypoint x="1360" y="195" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_ArchiveSplit_Skip_di" bpmnElement="F_ArchiveSplit_Skip">
+        <di:waypoint x="1327" y="263" />
+        <di:waypoint x="1525" y="263" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_Archive_ArchiveJoin_di" bpmnElement="F_Archive_ArchiveJoin">
+        <di:waypoint x="1490" y="195" />
+        <di:waypoint x="1507" y="195" />
+        <di:waypoint x="1507" y="263" />
+        <di:waypoint x="1525" y="263" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_ArchiveJoin_End_di" bpmnElement="F_ArchiveJoin_End">
+        <di:waypoint x="1557" y="263" />
+        <di:waypoint x="1590" y="263" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

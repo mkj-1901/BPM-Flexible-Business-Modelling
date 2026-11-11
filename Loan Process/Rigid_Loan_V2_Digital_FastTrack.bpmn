@@ -1,0 +1,68 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_RigidLoanV2DigitalFastTrack" targetNamespace="http://bpmn.io/schema/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/20100524/MODEL.xsd">
+  <bpmn:process id="RigidLoanV2DigitalFastTrack" name="Rigid Loan V2 – Digital Fast-Track" isExecutable="true">
+    <bpmn:documentation>V2 Digital Fast-Track rigid model: five sequential activities. Skips manual assessment (uses Auto-Approve Check) and skips Archive step.</bpmn:documentation>
+    <bpmn:startEvent id="StartEvent" name="Start" />
+    <bpmn:task id="ReceiveRequest" name="Receive Request" />
+    <bpmn:task id="CheckCreditSystem" name="Check Credit System" />
+    <bpmn:task id="VerifyDocuments" name="Verify Documents" />
+    <bpmn:task id="AutoApproveCheck" name="Auto-Approve Check" />
+    <bpmn:task id="AcceptLoan" name="Accept Loan" />
+    <bpmn:endEvent id="EndEvent" name="End" />
+    <bpmn:sequenceFlow id="Flow_Start_Receive" sourceRef="StartEvent" targetRef="ReceiveRequest" />
+    <bpmn:sequenceFlow id="Flow_Receive_Credit" sourceRef="ReceiveRequest" targetRef="CheckCreditSystem" />
+    <bpmn:sequenceFlow id="Flow_Credit_Verify" sourceRef="CheckCreditSystem" targetRef="VerifyDocuments" />
+    <bpmn:sequenceFlow id="Flow_Verify_AutoApprove" sourceRef="VerifyDocuments" targetRef="AutoApproveCheck" />
+    <bpmn:sequenceFlow id="Flow_AutoApprove_Accept" sourceRef="AutoApproveCheck" targetRef="AcceptLoan" />
+    <bpmn:sequenceFlow id="Flow_Accept_End" sourceRef="AcceptLoan" targetRef="EndEvent" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_RigidLoanV2DigitalFastTrack">
+    <bpmndi:BPMNPlane id="BPMNPlane_RigidLoanV2DigitalFastTrack" bpmnElement="RigidLoanV2DigitalFastTrack">
+      <bpmndi:BPMNShape id="StartEvent_di" bpmnElement="StartEvent">
+        <dc:Bounds x="70" y="170" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ReceiveRequest_di" bpmnElement="ReceiveRequest">
+        <dc:Bounds x="145" y="158" width="125" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CheckCreditSystem_di" bpmnElement="CheckCreditSystem">
+        <dc:Bounds x="310" y="158" width="145" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="VerifyDocuments_di" bpmnElement="VerifyDocuments">
+        <dc:Bounds x="495" y="158" width="135" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="AutoApproveCheck_di" bpmnElement="AutoApproveCheck">
+        <dc:Bounds x="670" y="158" width="145" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="AcceptLoan_di" bpmnElement="AcceptLoan">
+        <dc:Bounds x="855" y="158" width="120" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_di" bpmnElement="EndEvent">
+        <dc:Bounds x="1015" y="170" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_Start_Receive_di" bpmnElement="Flow_Start_Receive">
+        <di:waypoint x="106" y="188" />
+        <di:waypoint x="145" y="188" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Receive_Credit_di" bpmnElement="Flow_Receive_Credit">
+        <di:waypoint x="270" y="188" />
+        <di:waypoint x="310" y="188" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Credit_Verify_di" bpmnElement="Flow_Credit_Verify">
+        <di:waypoint x="455" y="188" />
+        <di:waypoint x="495" y="188" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Verify_AutoApprove_di" bpmnElement="Flow_Verify_AutoApprove">
+        <di:waypoint x="630" y="188" />
+        <di:waypoint x="670" y="188" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_AutoApprove_Accept_di" bpmnElement="Flow_AutoApprove_Accept">
+        <di:waypoint x="815" y="188" />
+        <di:waypoint x="855" y="188" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Accept_End_di" bpmnElement="Flow_Accept_End">
+        <di:waypoint x="975" y="188" />
+        <di:waypoint x="1015" y="188" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

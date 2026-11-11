@@ -1,0 +1,77 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_RigidUniversityAdmissionV3" targetNamespace="http://bpmn.io/schema/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/20100524/MODEL.xsd">
+  <bpmn:process id="RigidUniversityAdmissionV3" name="V3 - Legacy Paper-Based Admission" isExecutable="true">
+    <bpmn:documentation>V3 Legacy Paper-Based Admission: Six sequential activities for a traditional paper-based process. Eligibility is checked manually, an interview is conducted instead of an entrance exam, merit is evaluated by a committee, admission is offered, and the student is enrolled manually via paper forms.</bpmn:documentation>
+    <bpmn:startEvent id="StartEvent" name="Start" />
+    <bpmn:task id="SubmitApplication" name="Submit Application" />
+    <bpmn:task id="CheckEligibilityManual" name="Check Eligibility (Manual)" />
+    <bpmn:task id="ConductInterview" name="Conduct Interview" />
+    <bpmn:task id="EvaluateMeritCommittee" name="Evaluate Merit (Committee)" />
+    <bpmn:task id="OfferAdmission" name="Offer Admission" />
+    <bpmn:task id="EnrollStudent" name="Enroll Student" />
+    <bpmn:endEvent id="EndEvent" name="End" />
+    <bpmn:sequenceFlow id="Flow_Start_Submit" sourceRef="StartEvent" targetRef="SubmitApplication" />
+    <bpmn:sequenceFlow id="Flow_Submit_Eligibility" sourceRef="SubmitApplication" targetRef="CheckEligibilityManual" />
+    <bpmn:sequenceFlow id="Flow_Eligibility_Interview" sourceRef="CheckEligibilityManual" targetRef="ConductInterview" />
+    <bpmn:sequenceFlow id="Flow_Interview_Merit" sourceRef="ConductInterview" targetRef="EvaluateMeritCommittee" />
+    <bpmn:sequenceFlow id="Flow_Merit_Offer" sourceRef="EvaluateMeritCommittee" targetRef="OfferAdmission" />
+    <bpmn:sequenceFlow id="Flow_Offer_Enroll" sourceRef="OfferAdmission" targetRef="EnrollStudent" />
+    <bpmn:sequenceFlow id="Flow_Enroll_End" sourceRef="EnrollStudent" targetRef="EndEvent" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_V3">
+    <bpmndi:BPMNPlane id="BPMNPlane_V3" bpmnElement="RigidUniversityAdmissionV3">
+      <bpmndi:BPMNShape id="StartEvent_di" bpmnElement="StartEvent">
+        <dc:Bounds x="70" y="170" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SubmitApplication_di" bpmnElement="SubmitApplication">
+        <dc:Bounds x="145" y="158" width="140" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CheckEligibilityManual_di" bpmnElement="CheckEligibilityManual">
+        <dc:Bounds x="325" y="158" width="170" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ConductInterview_di" bpmnElement="ConductInterview">
+        <dc:Bounds x="535" y="158" width="150" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EvaluateMeritCommittee_di" bpmnElement="EvaluateMeritCommittee">
+        <dc:Bounds x="725" y="158" width="180" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="OfferAdmission_di" bpmnElement="OfferAdmission">
+        <dc:Bounds x="945" y="158" width="140" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EnrollStudent_di" bpmnElement="EnrollStudent">
+        <dc:Bounds x="1125" y="158" width="130" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_di" bpmnElement="EndEvent">
+        <dc:Bounds x="1295" y="170" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_Start_Submit_di" bpmnElement="Flow_Start_Submit">
+        <di:waypoint x="106" y="188" />
+        <di:waypoint x="145" y="188" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Submit_Eligibility_di" bpmnElement="Flow_Submit_Eligibility">
+        <di:waypoint x="285" y="188" />
+        <di:waypoint x="325" y="188" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Eligibility_Interview_di" bpmnElement="Flow_Eligibility_Interview">
+        <di:waypoint x="495" y="188" />
+        <di:waypoint x="535" y="188" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Interview_Merit_di" bpmnElement="Flow_Interview_Merit">
+        <di:waypoint x="685" y="188" />
+        <di:waypoint x="725" y="188" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Merit_Offer_di" bpmnElement="Flow_Merit_Offer">
+        <di:waypoint x="905" y="188" />
+        <di:waypoint x="945" y="188" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Offer_Enroll_di" bpmnElement="Flow_Offer_Enroll">
+        <di:waypoint x="1085" y="188" />
+        <di:waypoint x="1125" y="188" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Enroll_End_di" bpmnElement="Flow_Enroll_End">
+        <di:waypoint x="1255" y="188" />
+        <di:waypoint x="1295" y="188" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
