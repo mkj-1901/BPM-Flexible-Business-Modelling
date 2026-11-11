@@ -1,0 +1,69 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_RigidEmployeeRecruitmentV4" targetNamespace="http://bpmn.io/schema/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/20100524/MODEL.xsd">
+  <bpmn:process id="RigidEmployeeRecruitmentV4" name="V4 - Rejected Candidate" isExecutable="true">
+    <bpmn:documentation>V4 Rejected Candidate rigid model: five sequential activities. Candidate completes resume screening, credential verification, and panel interview, then receives a rejection notice with no orientation.</bpmn:documentation>
+    <bpmn:startEvent id="StartEvent" name="Start" />
+    <bpmn:task id="ReceiveApplication" name="Receive Application" />
+    <bpmn:task id="ScreenResume" name="Screen Resume" />
+    <bpmn:task id="VerifyCredentials" name="Verify Credentials" />
+    <bpmn:task id="ConductPanelInterview" name="Conduct Panel Interview" />
+    <bpmn:task id="RejectCandidate" name="Reject Candidate" />
+    <bpmn:endEvent id="EndEvent" name="End" />
+    <bpmn:sequenceFlow id="Flow_Start_Receive" sourceRef="StartEvent" targetRef="ReceiveApplication" />
+    <bpmn:sequenceFlow id="Flow_Receive_Screen" sourceRef="ReceiveApplication" targetRef="ScreenResume" />
+    <bpmn:sequenceFlow id="Flow_Screen_Verify" sourceRef="ScreenResume" targetRef="VerifyCredentials" />
+    <bpmn:sequenceFlow id="Flow_Verify_Interview" sourceRef="VerifyCredentials" targetRef="ConductPanelInterview" />
+    <bpmn:sequenceFlow id="Flow_Interview_Reject" sourceRef="ConductPanelInterview" targetRef="RejectCandidate" />
+    <bpmn:sequenceFlow id="Flow_Reject_End" sourceRef="RejectCandidate" targetRef="EndEvent" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_RigidEmployeeRecruitmentV4">
+    <bpmndi:BPMNPlane id="BPMNPlane_RigidEmployeeRecruitmentV4" bpmnElement="RigidEmployeeRecruitmentV4">
+      <bpmndi:BPMNShape id="StartEvent_di" bpmnElement="StartEvent">
+        <dc:Bounds x="70" y="170" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ReceiveApplication_di" bpmnElement="ReceiveApplication">
+        <dc:Bounds x="146" y="158" width="145" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ScreenResume_di" bpmnElement="ScreenResume">
+        <dc:Bounds x="331" y="158" width="130" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="VerifyCredentials_di" bpmnElement="VerifyCredentials">
+        <dc:Bounds x="501" y="158" width="145" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ConductPanelInterview_di" bpmnElement="ConductPanelInterview">
+        <dc:Bounds x="686" y="158" width="175" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="RejectCandidate_di" bpmnElement="RejectCandidate">
+        <dc:Bounds x="901" y="158" width="145" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_di" bpmnElement="EndEvent">
+        <dc:Bounds x="1086" y="170" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_Start_Receive_di" bpmnElement="Flow_Start_Receive">
+        <di:waypoint x="106" y="188" />
+        <di:waypoint x="146" y="188" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Receive_Screen_di" bpmnElement="Flow_Receive_Screen">
+        <di:waypoint x="291" y="188" />
+        <di:waypoint x="331" y="188" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Screen_Verify_di" bpmnElement="Flow_Screen_Verify">
+        <di:waypoint x="461" y="188" />
+        <di:waypoint x="501" y="188" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Verify_Interview_di" bpmnElement="Flow_Verify_Interview">
+        <di:waypoint x="646" y="188" />
+        <di:waypoint x="686" y="188" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Interview_Reject_di" bpmnElement="Flow_Interview_Reject">
+        <di:waypoint x="861" y="188" />
+        <di:waypoint x="901" y="188" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Reject_End_di" bpmnElement="Flow_Reject_End">
+        <di:waypoint x="1046" y="188" />
+        <di:waypoint x="1086" y="188" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
+

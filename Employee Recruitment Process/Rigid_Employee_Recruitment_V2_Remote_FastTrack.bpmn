@@ -1,0 +1,69 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_RigidEmployeeRecruitmentV2" targetNamespace="http://bpmn.io/schema/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/20100524/MODEL.xsd">
+  <bpmn:process id="RigidEmployeeRecruitmentV2" name="V2 - Remote Fast-Track Hire" isExecutable="true">
+    <bpmn:documentation>V2 Remote Fast-Track Hire rigid model: five sequential activities. Uses automated assessment instead of panel interview and skips in-person orientation.</bpmn:documentation>
+    <bpmn:startEvent id="StartEvent" name="Start" />
+    <bpmn:task id="ReceiveApplication" name="Receive Application" />
+    <bpmn:task id="ScreenResume" name="Screen Resume" />
+    <bpmn:task id="VerifyCredentials" name="Verify Credentials" />
+    <bpmn:task id="RunAutomatedAssessment" name="Run Automated Assessment" />
+    <bpmn:task id="ExtendJobOffer" name="Extend Job Offer" />
+    <bpmn:endEvent id="EndEvent" name="End" />
+    <bpmn:sequenceFlow id="Flow_Start_Receive" sourceRef="StartEvent" targetRef="ReceiveApplication" />
+    <bpmn:sequenceFlow id="Flow_Receive_Screen" sourceRef="ReceiveApplication" targetRef="ScreenResume" />
+    <bpmn:sequenceFlow id="Flow_Screen_Verify" sourceRef="ScreenResume" targetRef="VerifyCredentials" />
+    <bpmn:sequenceFlow id="Flow_Verify_Auto" sourceRef="VerifyCredentials" targetRef="RunAutomatedAssessment" />
+    <bpmn:sequenceFlow id="Flow_Auto_Offer" sourceRef="RunAutomatedAssessment" targetRef="ExtendJobOffer" />
+    <bpmn:sequenceFlow id="Flow_Offer_End" sourceRef="ExtendJobOffer" targetRef="EndEvent" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_RigidEmployeeRecruitmentV2">
+    <bpmndi:BPMNPlane id="BPMNPlane_RigidEmployeeRecruitmentV2" bpmnElement="RigidEmployeeRecruitmentV2">
+      <bpmndi:BPMNShape id="StartEvent_di" bpmnElement="StartEvent">
+        <dc:Bounds x="70" y="170" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ReceiveApplication_di" bpmnElement="ReceiveApplication">
+        <dc:Bounds x="146" y="158" width="145" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ScreenResume_di" bpmnElement="ScreenResume">
+        <dc:Bounds x="331" y="158" width="130" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="VerifyCredentials_di" bpmnElement="VerifyCredentials">
+        <dc:Bounds x="501" y="158" width="145" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="RunAutomatedAssessment_di" bpmnElement="RunAutomatedAssessment">
+        <dc:Bounds x="686" y="158" width="185" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExtendJobOffer_di" bpmnElement="ExtendJobOffer">
+        <dc:Bounds x="911" y="158" width="135" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_di" bpmnElement="EndEvent">
+        <dc:Bounds x="1086" y="170" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_Start_Receive_di" bpmnElement="Flow_Start_Receive">
+        <di:waypoint x="106" y="188" />
+        <di:waypoint x="146" y="188" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Receive_Screen_di" bpmnElement="Flow_Receive_Screen">
+        <di:waypoint x="291" y="188" />
+        <di:waypoint x="331" y="188" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Screen_Verify_di" bpmnElement="Flow_Screen_Verify">
+        <di:waypoint x="461" y="188" />
+        <di:waypoint x="501" y="188" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Verify_Auto_di" bpmnElement="Flow_Verify_Auto">
+        <di:waypoint x="646" y="188" />
+        <di:waypoint x="686" y="188" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Auto_Offer_di" bpmnElement="Flow_Auto_Offer">
+        <di:waypoint x="871" y="188" />
+        <di:waypoint x="911" y="188" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Offer_End_di" bpmnElement="Flow_Offer_End">
+        <di:waypoint x="1046" y="188" />
+        <di:waypoint x="1086" y="188" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
+

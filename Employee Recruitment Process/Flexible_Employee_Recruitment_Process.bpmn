@@ -1,0 +1,233 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_FlexibleEmployeeRecruitmentProcess" targetNamespace="http://bpmn.io/schema/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/20100524/MODEL.xsd">
+  <bpmn:process id="FlexibleEmployeeRecruitmentProcess" name="Unified Flexible Employee Recruitment Process" isExecutable="true">
+    <bpmn:documentation>Unified flexible model for four employee recruitment variants: V1 Standard Corporate Hire, V2 Remote Fast-Track Hire, V3 Legacy Paper-Dossier Hire, and V4 Rejected Candidate. Set process variable variant to V1, V2, V3, or V4 to select the intended path. Gateway conditions use Camunda 8 FEEL expressions. Activity shapes are generic BPMN tasks for diagramming; configure executable implementations or task types before running in an engine.</bpmn:documentation>
+    <bpmn:startEvent id="StartEvent" name="Start" />
+    <bpmn:task id="ReceiveApplication" name="Receive Application" />
+    <bpmn:exclusiveGateway id="ScreeningSplit" name="Screening Source" gatewayDirection="Diverging" default="F_ScreenSplit_Resume" />
+    <bpmn:task id="ScreenResume" name="Screen Resume" />
+    <bpmn:task id="ReviewPaperDossier" name="Review Paper Dossier" />
+    <bpmn:exclusiveGateway id="ScreeningJoin" gatewayDirection="Converging" />
+    <bpmn:task id="VerifyCredentials" name="Verify Credentials" />
+    <bpmn:exclusiveGateway id="AssessmentSplit" name="Assessment Mode" gatewayDirection="Diverging" default="F_AssessSplit_Interview" />
+    <bpmn:task id="ConductPanelInterview" name="Conduct Panel Interview" />
+    <bpmn:task id="RunAutomatedAssessment" name="Run Automated Assessment" />
+    <bpmn:exclusiveGateway id="AssessmentJoin" gatewayDirection="Converging" />
+    <bpmn:exclusiveGateway id="DecisionSplit" name="Hiring Decision" gatewayDirection="Diverging" default="F_DecisionSplit_Offer" />
+    <bpmn:task id="ExtendJobOffer" name="Extend Job Offer" />
+    <bpmn:task id="RejectCandidate" name="Reject Candidate" />
+    <bpmn:exclusiveGateway id="DecisionJoin" gatewayDirection="Converging" />
+    <bpmn:exclusiveGateway id="OrientationSplit" name="Orientation?" gatewayDirection="Diverging" default="F_OrientSplit_Skip" />
+    <bpmn:task id="ConductOrientation" name="Conduct Orientation" />
+    <bpmn:exclusiveGateway id="OrientationJoin" gatewayDirection="Converging" />
+    <bpmn:endEvent id="EndEvent" name="End" />
+    <bpmn:sequenceFlow id="F_Start_Receive" sourceRef="StartEvent" targetRef="ReceiveApplication" />
+    <bpmn:sequenceFlow id="F_Receive_ScreenSplit" sourceRef="ReceiveApplication" targetRef="ScreeningSplit" />
+    <bpmn:sequenceFlow id="F_ScreenSplit_Resume" sourceRef="ScreeningSplit" targetRef="ScreenResume" name="Digital / Standard" />
+    <bpmn:sequenceFlow id="F_ScreenSplit_Paper" sourceRef="ScreeningSplit" targetRef="ReviewPaperDossier" name="Legacy">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= variant = "V3"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F_Resume_ScreenJoin" sourceRef="ScreenResume" targetRef="ScreeningJoin" />
+    <bpmn:sequenceFlow id="F_Paper_ScreenJoin" sourceRef="ReviewPaperDossier" targetRef="ScreeningJoin" />
+    <bpmn:sequenceFlow id="F_ScreenJoin_Verify" sourceRef="ScreeningJoin" targetRef="VerifyCredentials" />
+    <bpmn:sequenceFlow id="F_Verify_AssessSplit" sourceRef="VerifyCredentials" targetRef="AssessmentSplit" />
+    <bpmn:sequenceFlow id="F_AssessSplit_Interview" sourceRef="AssessmentSplit" targetRef="ConductPanelInterview" name="Standard / Rejected" />
+    <bpmn:sequenceFlow id="F_AssessSplit_Auto" sourceRef="AssessmentSplit" targetRef="RunAutomatedAssessment" name="Remote Fast-Track">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= variant = "V2"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F_Interview_AssessJoin" sourceRef="ConductPanelInterview" targetRef="AssessmentJoin" />
+    <bpmn:sequenceFlow id="F_Auto_AssessJoin" sourceRef="RunAutomatedAssessment" targetRef="AssessmentJoin" />
+    <bpmn:sequenceFlow id="F_AssessJoin_DecisionSplit" sourceRef="AssessmentJoin" targetRef="DecisionSplit" />
+    <bpmn:sequenceFlow id="F_DecisionSplit_Offer" sourceRef="DecisionSplit" targetRef="ExtendJobOffer" name="Selected" />
+    <bpmn:sequenceFlow id="F_DecisionSplit_Reject" sourceRef="DecisionSplit" targetRef="RejectCandidate" name="Not Selected">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= variant = "V4"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F_Offer_DecisionJoin" sourceRef="ExtendJobOffer" targetRef="DecisionJoin" />
+    <bpmn:sequenceFlow id="F_Reject_DecisionJoin" sourceRef="RejectCandidate" targetRef="DecisionJoin" />
+    <bpmn:sequenceFlow id="F_DecisionJoin_OrientSplit" sourceRef="DecisionJoin" targetRef="OrientationSplit" />
+    <bpmn:sequenceFlow id="F_OrientSplit_Orient" sourceRef="OrientationSplit" targetRef="ConductOrientation" name="In-person onboarding">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= variant = "V1" or variant = "V3"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F_OrientSplit_Skip" sourceRef="OrientationSplit" targetRef="OrientationJoin" name="Remote / Rejected" />
+    <bpmn:sequenceFlow id="F_Orient_OrientJoin" sourceRef="ConductOrientation" targetRef="OrientationJoin" />
+    <bpmn:sequenceFlow id="F_OrientJoin_End" sourceRef="OrientationJoin" targetRef="EndEvent" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_FlexibleEmployeeRecruitmentProcess">
+    <bpmndi:BPMNPlane id="BPMNPlane_FlexibleEmployeeRecruitmentProcess" bpmnElement="FlexibleEmployeeRecruitmentProcess">
+      <bpmndi:BPMNShape id="StartEvent_di" bpmnElement="StartEvent">
+        <dc:Bounds x="40" y="245" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ReceiveApplication_di" bpmnElement="ReceiveApplication">
+        <dc:Bounds x="106" y="233" width="145" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ScreeningSplit_di" bpmnElement="ScreeningSplit" isMarkerVisible="true">
+        <dc:Bounds x="286" y="247" width="32" height="32" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ScreenResume_di" bpmnElement="ScreenResume">
+        <dc:Bounds x="350" y="165" width="160" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ReviewPaperDossier_di" bpmnElement="ReviewPaperDossier">
+        <dc:Bounds x="350" y="305" width="160" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ScreeningJoin_di" bpmnElement="ScreeningJoin" isMarkerVisible="true">
+        <dc:Bounds x="545" y="247" width="32" height="32" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="VerifyCredentials_di" bpmnElement="VerifyCredentials">
+        <dc:Bounds x="610" y="233" width="145" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="AssessmentSplit_di" bpmnElement="AssessmentSplit" isMarkerVisible="true">
+        <dc:Bounds x="790" y="247" width="32" height="32" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ConductPanelInterview_di" bpmnElement="ConductPanelInterview">
+        <dc:Bounds x="855" y="165" width="180" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="RunAutomatedAssessment_di" bpmnElement="RunAutomatedAssessment">
+        <dc:Bounds x="855" y="305" width="180" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="AssessmentJoin_di" bpmnElement="AssessmentJoin" isMarkerVisible="true">
+        <dc:Bounds x="1070" y="247" width="32" height="32" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DecisionSplit_di" bpmnElement="DecisionSplit" isMarkerVisible="true">
+        <dc:Bounds x="1135" y="247" width="32" height="32" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExtendJobOffer_di" bpmnElement="ExtendJobOffer">
+        <dc:Bounds x="1200" y="165" width="145" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="RejectCandidate_di" bpmnElement="RejectCandidate">
+        <dc:Bounds x="1200" y="305" width="145" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DecisionJoin_di" bpmnElement="DecisionJoin" isMarkerVisible="true">
+        <dc:Bounds x="1380" y="247" width="32" height="32" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="OrientationSplit_di" bpmnElement="OrientationSplit" isMarkerVisible="true">
+        <dc:Bounds x="1445" y="247" width="32" height="32" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ConductOrientation_di" bpmnElement="ConductOrientation">
+        <dc:Bounds x="1510" y="165" width="155" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="OrientationJoin_di" bpmnElement="OrientationJoin" isMarkerVisible="true">
+        <dc:Bounds x="1700" y="247" width="32" height="32" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_di" bpmnElement="EndEvent">
+        <dc:Bounds x="1765" y="245" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="F_Start_Receive_di" bpmnElement="F_Start_Receive">
+        <di:waypoint x="76" y="263" />
+        <di:waypoint x="106" y="263" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_Receive_ScreenSplit_di" bpmnElement="F_Receive_ScreenSplit">
+        <di:waypoint x="251" y="263" />
+        <di:waypoint x="286" y="263" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_ScreenSplit_Resume_di" bpmnElement="F_ScreenSplit_Resume">
+        <di:waypoint x="318" y="263" />
+        <di:waypoint x="334" y="263" />
+        <di:waypoint x="334" y="195" />
+        <di:waypoint x="350" y="195" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_ScreenSplit_Paper_di" bpmnElement="F_ScreenSplit_Paper">
+        <di:waypoint x="318" y="263" />
+        <di:waypoint x="334" y="263" />
+        <di:waypoint x="334" y="335" />
+        <di:waypoint x="350" y="335" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_Resume_ScreenJoin_di" bpmnElement="F_Resume_ScreenJoin">
+        <di:waypoint x="510" y="195" />
+        <di:waypoint x="527" y="195" />
+        <di:waypoint x="527" y="263" />
+        <di:waypoint x="545" y="263" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_Paper_ScreenJoin_di" bpmnElement="F_Paper_ScreenJoin">
+        <di:waypoint x="510" y="335" />
+        <di:waypoint x="527" y="335" />
+        <di:waypoint x="527" y="263" />
+        <di:waypoint x="545" y="263" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_ScreenJoin_Verify_di" bpmnElement="F_ScreenJoin_Verify">
+        <di:waypoint x="577" y="263" />
+        <di:waypoint x="610" y="263" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_Verify_AssessSplit_di" bpmnElement="F_Verify_AssessSplit">
+        <di:waypoint x="755" y="263" />
+        <di:waypoint x="790" y="263" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_AssessSplit_Interview_di" bpmnElement="F_AssessSplit_Interview">
+        <di:waypoint x="822" y="263" />
+        <di:waypoint x="838" y="263" />
+        <di:waypoint x="838" y="195" />
+        <di:waypoint x="855" y="195" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_AssessSplit_Auto_di" bpmnElement="F_AssessSplit_Auto">
+        <di:waypoint x="822" y="263" />
+        <di:waypoint x="838" y="263" />
+        <di:waypoint x="838" y="335" />
+        <di:waypoint x="855" y="335" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_Interview_AssessJoin_di" bpmnElement="F_Interview_AssessJoin">
+        <di:waypoint x="1035" y="195" />
+        <di:waypoint x="1052" y="195" />
+        <di:waypoint x="1052" y="263" />
+        <di:waypoint x="1070" y="263" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_Auto_AssessJoin_di" bpmnElement="F_Auto_AssessJoin">
+        <di:waypoint x="1035" y="335" />
+        <di:waypoint x="1052" y="335" />
+        <di:waypoint x="1052" y="263" />
+        <di:waypoint x="1070" y="263" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_AssessJoin_DecisionSplit_di" bpmnElement="F_AssessJoin_DecisionSplit">
+        <di:waypoint x="1102" y="263" />
+        <di:waypoint x="1135" y="263" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_DecisionSplit_Offer_di" bpmnElement="F_DecisionSplit_Offer">
+        <di:waypoint x="1167" y="263" />
+        <di:waypoint x="1183" y="263" />
+        <di:waypoint x="1183" y="195" />
+        <di:waypoint x="1200" y="195" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_DecisionSplit_Reject_di" bpmnElement="F_DecisionSplit_Reject">
+        <di:waypoint x="1167" y="263" />
+        <di:waypoint x="1183" y="263" />
+        <di:waypoint x="1183" y="335" />
+        <di:waypoint x="1200" y="335" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_Offer_DecisionJoin_di" bpmnElement="F_Offer_DecisionJoin">
+        <di:waypoint x="1345" y="195" />
+        <di:waypoint x="1362" y="195" />
+        <di:waypoint x="1362" y="263" />
+        <di:waypoint x="1380" y="263" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_Reject_DecisionJoin_di" bpmnElement="F_Reject_DecisionJoin">
+        <di:waypoint x="1345" y="335" />
+        <di:waypoint x="1362" y="335" />
+        <di:waypoint x="1362" y="263" />
+        <di:waypoint x="1380" y="263" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_DecisionJoin_OrientSplit_di" bpmnElement="F_DecisionJoin_OrientSplit">
+        <di:waypoint x="1412" y="263" />
+        <di:waypoint x="1445" y="263" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_OrientSplit_Orient_di" bpmnElement="F_OrientSplit_Orient">
+        <di:waypoint x="1477" y="263" />
+        <di:waypoint x="1493" y="263" />
+        <di:waypoint x="1493" y="195" />
+        <di:waypoint x="1510" y="195" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_OrientSplit_Skip_di" bpmnElement="F_OrientSplit_Skip">
+        <di:waypoint x="1477" y="263" />
+        <di:waypoint x="1700" y="263" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_Orient_OrientJoin_di" bpmnElement="F_Orient_OrientJoin">
+        <di:waypoint x="1665" y="195" />
+        <di:waypoint x="1682" y="195" />
+        <di:waypoint x="1682" y="263" />
+        <di:waypoint x="1700" y="263" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_OrientJoin_End_di" bpmnElement="F_OrientJoin_End">
+        <di:waypoint x="1732" y="263" />
+        <di:waypoint x="1765" y="263" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
+
