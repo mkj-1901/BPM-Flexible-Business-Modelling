@@ -1,0 +1,14 @@
+{
+  "name": "bpm-flexible-modelling-tool",
+  "version": "1.0.0",
+  "description": "Natural-language prompt to Rigid vs. Flexible BPMN 2.0 diagrams and Comparison_Analysis.md generator",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "check": "node --check server.js && node --check api/index.js && node --check src/engine.js && node --check src/env.js && node --check src/gemini.js && node --check src/localParser.js && node --check src/presets.js && node --check src/zip.js && node --check public/app.js"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

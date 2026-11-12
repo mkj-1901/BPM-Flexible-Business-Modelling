@@ -1,0 +1,16 @@
+# Environment variables & secrets (never commit .env!)
+.env
+.env.local
+.env.*.local
+
+# Dependencies & logs
+node_modules/
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS / editor artifacts
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

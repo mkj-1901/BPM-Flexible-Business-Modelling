@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="sky">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BPM Studio — Flexible vs. Rigid Modelling</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="ambient-bg" aria-hidden="true">
+    <div class="ambient-orb orb-1"></div>
+    <div class="ambient-orb orb-2"></div>
+    <div class="ambient-orb orb-3"></div>
+  </div>
+
+  <!-- Light Frosted Top Navigation -->
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand" id="brandHomeBtn" role="button" tabindex="0" title="Go to Process Studio">
+        <div class="brand-mark" aria-hidden="true">✦</div>
+        <div>
+          <h1>BPM Studio</h1>
+          <p class="subtitle">Flexible vs. Rigid BPMN 2.0</p>
+        </div>
+      </div>
+
+      <nav class="main-nav" aria-label="Primary sections">
+        <button id="navStudioBtn" class="nav-pill active" type="button" data-view="studio">
+          <span class="nav-icon" aria-hidden="true">✦</span>
+          <span>Process Studio</span>
+        </button>
+        <button id="navRefsBtn" class="nav-pill" type="button" data-view="references">
+          <span class="nav-icon" aria-hidden="true">▤</span>
+          <span>Repo References</span>
+          <span id="repoRefCountPill" class="nav-count">3</span>
+        </button>
+      </nav>
+
+      <div class="header-right">
+        <div class="theme-switcher" role="group" aria-label="Color theme">
+          <button type="button" class="theme-dot active" data-theme-pick="sky" title="Sky Breeze theme" aria-label="Sky Breeze theme"></button>
+          <button type="button" class="theme-dot" data-theme-pick="mint" title="Aurora Mint theme" aria-label="Aurora Mint theme"></button>
+          <button type="button" class="theme-dot" data-theme-pick="lavender" title="Soft Lavender theme" aria-label="Soft Lavender theme"></button>
+        </div>
+        <div id="apiStatusBadge" class="status-badge status-loading">Checking backend...</div>
+      </div>
+    </div>
+  </header>
+
+  <main class="app-shell">
+    <!-- ==================== VIEW 1: MAIN GEMINI-STYLE PROCESS STUDIO ==================== -->
+    <section id="view-studio" class="view-section active">
+      <div class="studio-stage" id="studioStage">
+        <!-- Hero Greeting (prominent before first prompt, compacting gracefully after) -->
+        <div id="studioHero" class="studio-hero">
+          <div class="hero-pill">
+            <span class="sparkle" aria-hidden="true">✦</span>
+            <span>Natural Language &rarr; BPMN 2.0 &amp; Comparison Stats</span>
+          </div>
+          <h2 class="hero-title">Model your process &amp; compare Rigid vs. Flexible</h2>
+          <p class="hero-subtitle">
+            Describe your business process below, add version or variant details if needed, and generate unified BPMN 2.0 diagrams &amp; <code>Comparison_Analysis.md</code>.
+          </p>
+        </div>
+
+        <!-- Centered Conversation Turn & Loading Stream -->
+        <div id="chatThread" class="chat-thread" hidden>
+          <div id="historyBar" class="history-bar" hidden></div>
+          <div id="activePromptBubble" class="user-prompt-bubble" hidden></div>
+          <div id="chatLoadingCard" class="assistant-loading-card" hidden>
+            <div class="loading-avatar">✦</div>
+            <div class="loading-body">
+              <div class="loading-title">Designing Rigid &amp; Unified Flexible BPMN 2.0 models...</div>
+              <div class="loading-shimmer-lines">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Output Workspace Slot for Studio (directly under the User Prompt Bubble, like Gemini!) -->
+        <div id="studioOutputSlot" class="output-slot"></div>
+
+        <!-- Centered Gemini-Style Composer Card -->
+        <div class="composer-wrap" id="composerWrap">
+          <div class="gemini-composer" id="geminiComposer">
+            <!-- Step 1: Process Description -->
+            <div class="composer-block">
+              <div class="composer-block-head">
+                <label for="promptInput" class="composer-label">
+                  <span class="step-dot">1</span>
+                  Process &amp; Activities
+                </label>
+                <span class="composer-hint">Plain English workflow or stages</span>
+              </div>
+              <textarea
+                id="promptInput"
+                rows="3"
+                placeholder="Describe your business process... e.g., In our E-Commerce Order Fulfillment process, every order starts with Receive Order and Check Inventory, customers pay by card or cash on delivery..."
+              ></textarea>
+            </div>
+
+            <div class="composer-divider"></div>
+
+            <!-- Step 2: Version / Variant Details -->
+            <div class="composer-block version-block">
+              <div class="composer-block-head">
+                <div class="composer-label">
+                  <span class="step-dot step-dot-soft">2</span>
+                  <span>Version / Variant Details</span>
+                  <span class="optional-tag">Optional</span>
+                </div>
+                <div class="version-controls">
+                  <div class="mini-segmented" role="group" aria-label="Version input mode">
+                    <button type="button" id="versionModeRowsBtn" class="mini-seg-btn active">Rows</button>
+                    <button type="button" id="versionModeTextBtn" class="mini-seg-btn">Text</button>
+                  </div>
+                  <button type="button" id="addVersionRowBtn" class="btn-pill-soft">+ Add Version</button>
+                </div>
+              </div>
+
+              <div id="versionRowsWrap" class="version-rows"></div>
+
+              <div id="versionTextWrap" class="version-text-wrap" hidden>
+                <textarea
+                  id="versionNotesInput"
+                  rows="3"
+                  placeholder="Optional: Describe or list versions, e.g.&#10;V1 (Standard): Receive Request -> Verify Docs -> Manual Review -> Approve&#10;V2 (Fast-Track): Receive Request -> Auto-Verify -> Approve"
+                ></textarea>
+              </div>
+            </div>
+
+            <!-- Composer Bottom Action Toolbar -->
+            <div class="composer-toolbar">
+              <div class="toolbar-left">
+                <div class="engine-pill-wrap">
+                  <label for="engineModeSelect" class="sr-only">Backend Engine</label>
+                  <select id="engineModeSelect" class="engine-select" title="Choose generation backend">
+                    <option value="auto">✦ Auto (Gemini + Fallback)</option>
+                    <option value="gemini">✦ Gemini LLM</option>
+                    <option value="local">⚙ Local Offline Parser</option>
+                  </select>
+                </div>
+                <span class="shortcut-tip">Ctrl + Enter to generate</span>
+              </div>
+
+              <div class="toolbar-right">
+                <button id="newChatBtn" class="btn btn-ghost btn-sm" type="button" hidden>New Process</button>
+                <button id="clearBtn" class="btn btn-ghost btn-sm" type="button">Clear</button>
+                <button id="generateBtn" class="btn btn-gradient" type="button">
+                  <span class="btn-spinner" id="btnSpinner" hidden></span>
+                  <span id="generateBtnIcon" aria-hidden="true">✦</span>
+                  <span id="generateBtnText">Generate</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Starter Chips (non-repo samples + link to Repo References) -->
+          <div class="starter-row" id="starterRow">
+            <span class="starter-label">Try a sample:</span>
+            <div id="starterChips" class="starter-chips"></div>
+            <button type="button" id="jumpToRefsChip" class="starter-link-chip">
+              Repo References &rarr;
+            </button>
+          </div>
+
+          <div id="alertBanner" class="alert-banner" hidden></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 2: SEPARATE REPO REFERENCES SECTION ==================== -->
+    <section id="view-references" class="view-section" hidden>
+      <div class="refs-container">
+        <div class="refs-hero card-glass">
+          <div>
+            <div class="hero-pill">
+              <span>Repository Case Studies</span>
+            </div>
+            <h2>Canonical BPMN 2.0 Repo References</h2>
+            <p class="helper-text">
+              Explore the three verified domain case studies stored in this repository (<code>Loan Process/</code>, <code>University Admission Process/</code>, and <code>Employee Recruitment Process/</code>). Inspect exact Table IV structural reductions and BPMN 2.0 diagrams, or send any prompt to the Studio chat.
+            </p>
+          </div>
+          <button type="button" id="backToStudioFromRefsBtn" class="btn btn-secondary">
+            &larr; Back to Process Studio
+          </button>
+        </div>
+
+        <div id="repoRefGrid" class="repo-ref-grid"></div>
+
+        <div id="refAlertBanner" class="alert-banner" hidden></div>
+
+        <!-- Output Workspace Slot for Repo Reference Inspection -->
+        <div id="refOutputSlot" class="output-slot"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ==================== SHARED INTERACTIVE RESULTS WORKSPACE ==================== -->
+  <div id="resultsWorkspace" class="results-workspace" hidden>
+    <section class="card-glass results-banner">
+      <div class="results-banner-info">
+        <div class="result-badges-row">
+          <span id="runMetaBadge" class="engine-badge">Generated</span>
+          <span id="resultVariantCountBadge" class="soft-badge">0 Variants</span>
+        </div>
+        <h2 id="resultProcessName">Process Name</h2>
+        <p id="resultOverview" class="helper-text"></p>
+      </div>
+      <div class="export-actions">
+        <button id="downloadMdBtn" class="btn btn-secondary btn-sm" type="button">Download <code>.md</code></button>
+        <button id="downloadFlexBpmnBtn" class="btn btn-secondary btn-sm" type="button">Download Flexible <code>.bpmn</code></button>
+        <button id="downloadZipBtn" class="btn btn-gradient btn-sm" type="button">Download All (.zip)</button>
+      </div>
+    </section>
+
+    <!-- KPI Strip -->
+    <section id="kpiGrid" class="kpi-grid"></section>
+
+    <!-- Tabs Navigation -->
+    <nav class="tabs-bar" role="tablist">
+      <button class="tab-btn active" data-tab="diagrams" role="tab" aria-selected="true">Sample BPMN Diagrams</button>
+      <button class="tab-btn" data-tab="stats" role="tab" aria-selected="false">Comparison Stats &amp; Traces</button>
+      <button class="tab-btn" data-tab="markdown" role="tab" aria-selected="false">Comparison_Analysis.md</button>
+      <button class="tab-btn" data-tab="xml" role="tab" aria-selected="false">BPMN 2.0 XML Inspector</button>
+    </nav>
+
+    <!-- Tab 1: BPMN Diagrams -->
+    <section id="tab-diagrams" class="tab-panel active">
+      <div class="card-glass diagram-card">
+        <div class="diagram-header">
+          <div>
+            <h3>Unified Flexible BPMN 2.0 Model <span class="badge badge-blue">Flexibility by Selection</span></h3>
+            <p class="helper-text">
+              Single consolidated model using labelled XOR split/join gateways, Camunda 8 FEEL conditions, and bypass flows.
+            </p>
+          </div>
+          <div class="diagram-controls">
+            <button id="zoomOutBtn" class="btn btn-icon" type="button" title="Zoom out">&minus;</button>
+            <span id="zoomLevelLabel" class="zoom-label">100%</span>
+            <button id="zoomInBtn" class="btn btn-icon" type="button" title="Zoom in">+</button>
+            <button id="zoomResetBtn" class="btn btn-ghost btn-sm" type="button">Fit</button>
+            <button id="downloadFlexSvgBtn" class="btn btn-secondary btn-sm" type="button">Export SVG</button>
+          </div>
+        </div>
+
+        <div class="trace-bar">
+          <span class="trace-label">Highlight Variant Trace:</span>
+          <div id="variantTraceButtons" class="trace-buttons"></div>
+        </div>
+        <div id="traceSequenceStrip" class="trace-sequence-strip" hidden></div>
+
+        <div class="svg-viewport" id="flexSvgViewport">
+          <div id="flexSvgContainer" class="svg-inner"></div>
+        </div>
+      </div>
+
+      <div class="card-glass">
+        <div class="diagram-header">
+          <div>
+            <h3>Rigid Baseline BPMN Models (<span id="rigidCountBadge">0</span> Separate Diagrams)</h3>
+            <p class="helper-text">
+              Without flexibility by selection, every operational variant requires its own isolated diagram with duplicated tasks.
+            </p>
+          </div>
+        </div>
+        <div id="rigidDiagramsGrid" class="rigid-grid"></div>
+      </div>
+    </section>
+
+    <!-- Tab 2: Comparison Stats & Traces -->
+    <section id="tab-stats" class="tab-panel" hidden>
+      <div class="stats-two-col">
+        <div class="card-glass">
+          <h3>Structural Comparison Chart (Rigid Combined vs. 1 Unified)</h3>
+          <div id="comparisonBars" class="bars-container"></div>
+        </div>
+        <div class="card-glass">
+          <h3>Structural Metrics (Table IV Format)</h3>
+          <div id="tableIvContainer" class="table-wrap"></div>
+        </div>
+      </div>
+
+      <div class="card-glass">
+        <h3>Variant Definitions (Table I Format)</h3>
+        <div id="tableVariantsContainer" class="table-wrap"></div>
+      </div>
+
+      <div class="card-glass">
+        <h3>Activity Classification (Mandatory, Alternative, Hybrid, Optional)</h3>
+        <div id="classificationContainer"></div>
+      </div>
+
+      <div class="card-glass">
+        <h3>Behavioral Trace Verification (Table III Format)</h3>
+        <p class="helper-text">
+          Each variant code is traced programmatically across the generated Unified Flexible BPMN graph to verify exact sequence equivalence.
+        </p>
+        <div id="tableTracesContainer" class="table-wrap"></div>
+      </div>
+    </section>
+
+    <!-- Tab 3: Comparison_Analysis.md -->
+    <section id="tab-markdown" class="tab-panel" hidden>
+      <div class="card-glass">
+        <div class="diagram-header">
+          <div>
+            <h3>Generated <code>Comparison_Analysis.md</code></h3>
+            <p class="helper-text">Matches the structured analysis format used across the repository's case studies.</p>
+          </div>
+          <div class="diagram-controls">
+            <button id="mdToggleRawBtn" class="btn btn-secondary btn-sm" type="button">Show Raw Markdown</button>
+            <button id="copyMdBtn" class="btn btn-secondary btn-sm" type="button">Copy Markdown</button>
+            <button id="downloadMdBtn2" class="btn btn-gradient btn-sm" type="button">Download .md</button>
+          </div>
+        </div>
+        <div id="mdRenderedView" class="markdown-body"></div>
+        <pre id="mdRawView" class="code-viewer" hidden></pre>
+      </div>
+    </section>
+
+    <!-- Tab 4: BPMN XML Inspector -->
+    <section id="tab-xml" class="tab-panel" hidden>
+      <div class="card-glass">
+        <div class="diagram-header">
+          <div class="xml-selector-wrap">
+            <label for="xmlFileSelect">Select BPMN 2.0 File:</label>
+            <select id="xmlFileSelect"></select>
+          </div>
+          <div class="diagram-controls">
+            <button id="copyXmlBtn" class="btn btn-secondary btn-sm" type="button">Copy XML</button>
+            <button id="downloadSelectedXmlBtn" class="btn btn-gradient btn-sm" type="button">Download .bpmn</button>
+          </div>
+        </div>
+        <pre id="xmlViewer" class="code-viewer"></pre>
+      </div>
+    </section>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
